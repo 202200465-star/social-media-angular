@@ -1,0 +1,43 @@
+<header class="navbar">
+  <div class="container navbar-content">
+    <a routerLink="/home" class="brand" aria-label="عدسة - الرئيسية">
+      <span class="brand-icon" aria-hidden="true">◎</span>
+
+      <span class="brand-text">
+        <strong>عدسة</strong>
+        <small>عالم التصوير الفوتوغرافي</small>
+      </span>
+    </a>
+
+    <nav aria-label="التنقل الرئيسي">
+      <a routerLink="/home" routerLinkActive="active">
+        الرئيسية
+      </a>
+
+      <a routerLink="/blog" routerLinkActive="active">
+        المدونة
+      </a>
+    <a routerLink="/community" routerLinkActive="active">المجتمع</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a
+        routerLink="/blog"
+        fragment="search"
+        class="search-link"
+        aria-label="البحث عن مقالات"
+      >
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6.5"></circle>
+          <path d="m16 16 4 4"></path>
+        </svg>
+      </a>
+
+      @if (api.token()) {
+        <a routerLink="/community/profile" class="read-button">حسابي</a>
+      } @else {
+        <a routerLink="/login" class="read-button">تسجيل الدخول</a>
+      }
+    </div>
+  </div>
+</header>

@@ -1,0 +1,30 @@
+<section class="social-surface auth-layout" dir="rtl">
+  <div class="auth-intro">
+    <span class="eyebrow">مجتمع التصوير</span>
+    <h1>مجتمع <span>عدسة</span></h1>
+    <p>شارك لحظاتك، اكتشف قصصًا جديدة، وتواصل مع أشخاص يشاركونك الشغف.</p>
+    <div class="panel"><h2>كل صورة تستحق حكاية</h2><p>انشر صورك وأفكارك، شارك في النقاشات، وابنِ ملفك الشخصي.</p><a routerLink="/blog">استكشف مقالات التصوير ←</a></div>
+  </div>
+  <div class="panel auth-card">
+    <nav class="tabs" aria-label="الدخول والتسجيل"><a routerLink="/login" [class.selected]="!signup()">تسجيل الدخول</a><a routerLink="/signup" [class.selected]="signup()">حساب جديد</a></nav>
+    <h2>{{ signup() ? 'إنشاء حساب جديد' : 'أهلًا بعودتك' }}</h2>
+    <p class="muted">{{ signup() ? 'ابدأ مشاركتك الأولى مع مجتمع عدسة.' : 'سجّل الدخول لمتابعة آخر المنشورات.' }}</p>
+    <form #form="ngForm" (ngSubmit)="submit(form)">
+      <fieldset [disabled]="busy()">
+      @if (signup()) {
+        <label>الاسم الكامل<input name="name" [(ngModel)]="values.name" required minlength="2" autocomplete="name"></label>
+        <label>اسم المستخدم (اختياري)<input name="username" [(ngModel)]="values.username" pattern="[a-z0-9_]{3,30}" autocomplete="username" dir="ltr"><small>3–30 حرفًا إنجليزيًا صغيرًا أو رقمًا أو _</small></label>
+        <label>البريد الإلكتروني<input type="email" name="email" [(ngModel)]="values.email" required email autocomplete="email" dir="ltr"></label>
+        <div class="form-row"><label>النوع<select name="gender" [(ngModel)]="values.gender" required><option value="" disabled>اختر النوع</option><option value="male">ذكر</option><option value="female">أنثى</option></select></label>
+        <label>تاريخ الميلاد<input type="date" name="dateOfBirth" [(ngModel)]="values.dateOfBirth" required [max]="today"></label></div>
+      } @else {
+        <label>البريد أو اسم المستخدم<input name="login" [(ngModel)]="values.login" required autocomplete="username" dir="ltr"></label>
+      }
+      <label>كلمة المرور<input type="password" name="password" [(ngModel)]="values.password" required [attr.autocomplete]="signup() ? 'new-password' : 'current-password'"></label>
+      @if (signup()) {<label>تأكيد كلمة المرور<input type="password" name="rePassword" [(ngModel)]="values.rePassword" required autocomplete="new-password"></label><small class="muted">8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز مثل @.</small>}
+      <button class="primary full" type="submit">{{ busy() ? 'جاري التنفيذ…' : signup() ? 'إنشاء الحساب' : 'تسجيل الدخول' }}</button>
+      </fieldset>
+      @if (error()) {<p class="error" role="alert">{{ error() }}</p>}
+    </form>
+  </div>
+</section>

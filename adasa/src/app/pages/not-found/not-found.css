@@ -1,0 +1,73 @@
+.not-found {
+  min-height: 65vh;
+  display: grid;
+  place-items: center;
+  padding: 75px 0;
+  text-align: center;
+  background:
+    radial-gradient(
+      ellipse at center,
+      #ff650010,
+      transparent 65%
+    ),
+    linear-gradient(#ffffff04 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff04 1px, transparent 1px);
+  background-size: auto, 55px 55px, 55px 55px;
+}
+
+.label {
+  display: inline-block;
+  padding: 5px 16px;
+  border: 1px solid #67320e;
+  border-radius: 25px;
+  background: #2b180a;
+  color: #ff9a44;
+  font-size: 13px;
+}
+
+.error-code {
+  font-size: clamp(110px, 20vw, 210px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-top: 15px;
+  color: var(--orange);
+  text-shadow: 0 0 70px #ff650025;
+}
+
+h1 {
+  font-size: clamp(25px, 4vw, 38px);
+  margin: 10px 0 15px;
+}
+
+p {
+  max-width: 490px;
+  margin: 0 auto;
+  color: #999;
+  font-size: 16px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.actions a {
+  padding: 12px 23px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.home-button {
+  background: var(--orange);
+  color: white;
+}
+
+.blog-button {
+  border: 1px solid #333;
+  background: #171717;
+  color: #eee;
+}

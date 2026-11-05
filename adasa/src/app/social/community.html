@@ -1,0 +1,59 @@
+<div class="social-surface community-layout" dir="rtl">
+  <aside class="panel sidebar">
+    <span class="eyebrow">مجتمع عدسة</span>
+    @if (api.user(); as user) {<div class="identity">@if (user.photo) {<img class="avatar" [src]="user.photo" alt="">}<div><strong>{{ user.name }}</strong><small class="muted">{{ user.username }}</small></div></div>}
+    <nav aria-label="المجتمع"><a routerLink="/community" [class.selected]="mode() === 'feed'">⌂ كل المنشورات</a><a routerLink="/community/profile" [class.selected]="mode() === 'profile'">◉ الملف الشخصي</a><a routerLink="/community/password" [class.selected]="mode() === 'password'">⚿ تغيير كلمة المرور</a><a routerLink="/blog">▧ مقالات التصوير</a></nav>
+    <button class="secondary full" (click)="api.logout()">تسجيل الخروج</button>
+  </aside>
+  <main class="feed">
+    <header class="page-heading"><span class="eyebrow">شارك • اكتشف • تواصل</span><h1>{{ mode() === 'profile' ? 'ملفي الشخصي' : mode() === 'password' ? 'أمان الحساب' : mode() === 'detail' ? 'تفاصيل المنشور' : 'لحظات من المجتمع' }}</h1><p class="muted">مساحة للصور والأفكار والحكايات.</p></header>
+    @if (error()) {<div class="error" role="alert">{{ error() }} <button class="secondary" [disabled]="busy()" (click)="load()">إعادة التحميل</button></div>}
+    @if (notice()) {<p class="success" role="status">{{ notice() }}</p>}
+    @if (loading()) {<div class="panel" role="status">جاري التحميل…</div>}
+    @else {
+      @if (mode() === 'profile') {
+        @if (api.user(); as user) {<section class="panel profile-card"><div class="profile-cover"></div><div class="identity">@if (user.photo) {<img class="avatar large" [src]="user.photo" alt="صورة الحساب">}<div><h2>{{ user.name }}</h2><p class="muted">{{ user.email }}</p><p>{{ user.username }}</p></div></div><a routerLink="/community/password">تغيير كلمة المرور ←</a></section>}
+      }
+      @if (mode() === 'password') {
+        <form class="panel" #passwordForm="ngForm" (ngSubmit)="changePassword(passwordForm)"><h2>تغيير كلمة المرور</h2><fieldset [disabled]="busy()">
+          <label>كلمة المرور الحالية<input type="password" name="password" [(ngModel)]="password" required autocomplete="current-password"></label>
+          <label>كلمة المرور الجديدة<input type="password" name="newPassword" [(ngModel)]="newPassword" required minlength="8" autocomplete="new-password"></label>
+          <label>تأكيد كلمة المرور الجديدة<input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" required autocomplete="new-password"></label>
+          <small class="muted">8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز مثل @.</small><button class="primary" type="submit">{{ busy() ? 'جاري الحفظ…' : 'حفظ كلمة المرور' }}</button>
+        </fieldset></form>
+      } @else {
+        @if (mode() !== 'detail') {
+          <form class="panel composer" #postForm="ngForm" (ngSubmit)="publish(postForm, upload)"><h2>ما الحكاية وراء صورتك؟</h2><fieldset [disabled]="busy()">
+            <label class="sr-only" for="post-body">محتوى المنشور</label><textarea id="post-body" name="body" [(ngModel)]="draft" rows="3" placeholder="شارك فكرة أو لحظة تستحق المشاهدة…"></textarea>
+            <div class="composer-actions"><label>صورة (اختياري)<input #upload type="file" accept="image/jpeg,image/png,image/webp" (change)="pick($event)"></label><button type="submit" class="primary">{{ busy() ? 'جاري النشر…' : 'نشر' }}</button></div><small class="muted">المنشور عام على منصة Route التعليمية. الصور حتى 5 MB.</small>
+          </fieldset></form>
+        }
+        @for (post of posts(); track post._id) {
+          <article class="panel post"><header class="post-header"><div class="identity">@if (post.user?.photo) {<img class="avatar" [src]="post.user.photo" alt="">}<div><strong>{{ post.user?.name || 'مستخدم' }}</strong><small class="muted">{{ post.createdAt | date:'medium' }}</small></div></div>
+            @if (own(post.user)) {<div class="actions"><button class="secondary" [disabled]="busy()" (click)="startEdit(post)">تعديل</button><button class="danger" [disabled]="busy()" (click)="deletePost(post)">حذف</button></div>}
+          </header>
+          @if (editing() === post._id) {
+            <form (ngSubmit)="savePost(post)"><fieldset [disabled]="busy()"><label>تعديل المنشور<textarea name="editBody" [(ngModel)]="editBody" rows="4"></textarea></label><label>استبدال الصورة<input type="file" accept="image/jpeg,image/png,image/webp" (change)="pick($event, true)"></label><div class="actions"><button type="submit" class="primary">حفظ</button><button type="button" class="secondary" (click)="editing.set(null)">إلغاء</button></div></fieldset></form>
+          } @else {<p class="post-text">{{ post.body }}</p>}
+          @if (post.image) {<img class="post-photo" [src]="post.image" alt="صورة المنشور" loading="lazy">}
+          @if (mode() !== 'detail') {<a class="post-link" [routerLink]="['/community/posts', post._id]">عرض المنشور وكل التعليقات @if (post.commentsCount !== undefined) { ({{ post.commentsCount }}) } ←</a>}
+          </article>
+        } @empty { @if (!error()) {<div class="panel empty">{{ mode() === 'detail' ? 'المنشور غير متاح.' : 'لا توجد منشورات حتى الآن. شارك أول منشور!' }}</div>} }
+        @if (nextPage()) {<button class="secondary full" [disabled]="moreBusy() || busy()" (click)="more()">{{ moreBusy() ? 'جاري التحميل…' : 'تحميل منشورات أخرى' }}</button>}
+        @if (mode() === 'detail' && posts().length) {
+          <section class="panel"><h2>التعليقات</h2><form (ngSubmit)="addComment()"><fieldset [disabled]="busy()"><label>أضف تعليقًا<textarea name="comment" [(ngModel)]="commentText" rows="2" required></textarea></label><button type="submit" class="primary" [disabled]="!commentText.trim()">إرسال التعليق</button></fieldset></form>
+            @for (comment of comments(); track comment._id) {
+              <article class="comment"><div class="identity">@if (comment.commentCreator?.photo) {<img class="avatar" [src]="comment.commentCreator.photo" alt="">}<div><strong>{{ comment.commentCreator?.name || 'مستخدم' }}</strong><small class="muted">{{ comment.createdAt | date:'medium' }}</small></div></div>
+                @if (editingComment() === comment._id) {<form (ngSubmit)="saveComment(comment)"><fieldset [disabled]="busy()"><label>تعديل التعليق<textarea name="editComment" [(ngModel)]="editComment" required></textarea></label><div class="actions"><button type="submit" class="primary" [disabled]="!editComment.trim()">حفظ</button><button type="button" class="secondary" (click)="editingComment.set(null)">إلغاء</button></div></fieldset></form>}
+                @else {<p class="post-text">{{ comment.content }}</p>}
+                @if (comment.image) {<img class="comment-photo" [src]="comment.image" alt="صورة التعليق" loading="lazy">}
+                <div class="actions">@if (own(comment.commentCreator)) {<button class="secondary" [disabled]="busy()" (click)="editingComment.set(comment._id); editComment = comment.content">تعديل</button>}@if (own(comment.commentCreator) || own(posts()[0].user)) {<button class="danger" [disabled]="busy()" (click)="deleteComment(comment)">حذف</button>}</div>
+              </article>
+            } @empty {<p class="muted">كن أول من يعلق.</p>}
+            @if (nextComments()) {<button class="secondary full" [disabled]="moreBusy() || busy()" (click)="more(true)">{{ moreBusy() ? 'جاري التحميل…' : 'تحميل المزيد من التعليقات' }}</button>}
+          </section><a routerLink="/community">→ العودة للمجتمع</a>
+        }
+      }
+    }
+  </main>
+</div>

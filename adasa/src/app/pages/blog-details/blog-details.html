@@ -1,0 +1,140 @@
+@if (loading()) {
+  <div class="container state-message" role="status">
+    <p>جاري تحميل المقال...</p>
+  </div>
+} @else if (error()) {
+  <div class="container state-message" role="alert">
+    <h1>تعذر تحميل المقال</h1>
+    <p>{{ error() }}</p>
+
+    <button type="button" class="orange-button" (click)="loadArticle()">
+      إعادة المحاولة
+    </button>
+  </div>
+} @else if (post(); as article) {
+  <article>
+    <header class="article-hero">
+      <img
+        class="hero-image"
+        [src]="article.image"
+        [alt]="article.title"
+      >
+
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-content">
+        <nav class="breadcrumbs" aria-label="مسار الصفحة">
+          <a routerLink="/home">الرئيسية</a>
+          <span aria-hidden="true">‹</span>
+          <a routerLink="/blog">المدونة</a>
+          <span aria-hidden="true">‹</span>
+          <span>{{ article.category }}</span>
+        </nav>
+
+        <span class="category-badge">{{ article.category }}</span>
+
+        <h1>{{ article.title }}</h1>
+
+        <p class="article-intro">{{ article.excerpt }}</p>
+
+        <div class="hero-meta">
+          <div class="author">
+            <img
+              [src]="article.author.avatar"
+              [alt]="article.author.name"
+            >
+
+            <div>
+              <strong>{{ article.author.name }}</strong>
+              <small>{{ article.author.role }}</small>
+            </div>
+          </div>
+
+          <span class="meta-divider"></span>
+
+          <time [attr.datetime]="article.date">
+            {{ formatDate(article.date) }}
+          </time>
+
+          <span>◷ {{ article.readTime }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <div class="article-main">
+        <div class="intro-box">
+          {{ article.excerpt }}
+        </div>
+
+        <div class="article-content">
+          @for (block of blocks(); track $index) {
+            @if (block.type === 'heading') {
+              <h2 [id]="'section-' + $index">
+                {{ block.text }}
+              </h2>
+            } @else {
+              <p>{{ block.text }}</p>
+            }
+          }
+        </div>
+
+        <div class="tags-section">
+          <h3>وسوم المقال</h3>
+
+          <div class="tags">
+            @for (tag of article.tags; track tag) {
+              <span># {{ tag }}</span>
+            }
+          </div>
+        </div>
+
+        <section class="author-box" aria-label="عن الكاتب">
+          <img
+            [src]="article.author.avatar"
+            [alt]="article.author.name"
+          >
+
+          <div>
+            <span class="orange-text">عن الكاتب</span>
+            <h3>{{ article.author.name }}</h3>
+            <p>{{ article.author.role }}</p>
+          </div>
+        </section>
+
+        <a routerLink="/blog" class="back-link">
+          → العودة لجميع المقالات
+        </a>
+      </div>
+
+      <aside class="article-sidebar">
+        <div class="sidebar-card">
+          <h2>محتويات المقال</h2>
+
+          <nav aria-label="محتويات المقال">
+            @for (block of blocks(); track $index) {
+              @if (block.type === 'heading') {
+                <a
+                  routerLink="/blog-details"
+                  [fragment]="'section-' + $index"
+                >
+                  {{ block.text }}
+                </a>
+              }
+            }
+          </nav>
+        </div>
+
+        <div class="sidebar-promo">
+          <span class="promo-icon" aria-hidden="true">◎</span>
+          <h3>طوّر مهاراتك في التصوير</h3>
+          <p>اكتشف المزيد من الدروس والنصائح العملية على عدسة.</p>
+
+          <a routerLink="/blog" class="orange-button">
+            استكشف المقالات ←
+          </a>
+        </div>
+      </aside>
+    </div>
+  </article>
+}

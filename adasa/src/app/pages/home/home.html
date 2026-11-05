@@ -1,0 +1,224 @@
+<section class="hero">
+  <div class="container">
+    <span class="section-label">● مرحبًا بك في عدسة</span>
+
+    <h1>
+      اكتشف <span>فن</span>
+      <br>
+      التصوير الفوتوغرافي
+    </h1>
+
+    <p class="hero-description">
+      انغمس في أسرار المحترفين ونصائح عملية لتطوير مهاراتك في التصوير
+    </p>
+
+    <div class="hero-actions">
+      <a routerLink="/blog" class="primary-button">
+        استكشف المقالات ←
+      </a>
+
+      <a routerLink="/home" fragment="featured" class="secondary-button">
+        اعرف المزيد ↓
+      </a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-icon">▤</span>
+        <strong>{{ loading() ? '…' : posts().length }}</strong>
+        <small>مقالة</small>
+      </div>
+
+      <div class="stat">
+        <span class="stat-icon">◎</span>
+        <strong>+10 آلاف</strong>
+        <small>قارئ — رقم توضيحي</small>
+      </div>
+
+      <div class="stat">
+        <span class="stat-icon">▦</span>
+        <strong>{{ loading() ? '…' : categories().length }}</strong>
+        <small>تصنيفات</small>
+      </div>
+
+      <div class="stat">
+        <span class="stat-icon">✎</span>
+        <strong>{{ loading() ? '…' : authorsCount() }}</strong>
+        <small>كاتب</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (loading()) {
+  <p class="state-message" role="status">جاري تحميل المقالات...</p>
+} @else if (error()) {
+  <div class="state-message" role="alert">
+    <p>{{ error() }}</p>
+    <button class="primary-button" type="button" (click)="loadPosts()">
+      إعادة المحاولة
+    </button>
+  </div>
+} @else {
+  <section class="featured-section section-space" id="featured">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="section-label">● مميز</span>
+          <h2>مقالات مختارة</h2>
+          <p>محتوى منتقى لبدء رحلة تعلمك</p>
+        </div>
+
+        <a routerLink="/blog" class="primary-button compact">
+          عرض الكل ←
+        </a>
+      </div>
+
+      <div class="featured-list">
+        @for (post of featuredPosts(); track post.id) {
+          <a routerLink="/blog-details" class="featured-card">
+            <div class="featured-image">
+              <img [src]="post.image" [alt]="post.title" loading="lazy">
+              <span class="featured-badge">★ مميز</span>
+            </div>
+
+            <div class="featured-body">
+              <div class="article-meta">
+                <span class="category-tag">{{ post.category }}</span>
+                <span>◷ {{ post.readTime }}</span>
+              </div>
+
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.excerpt }}</p>
+
+              <div class="article-bottom">
+                <div class="author">
+                  <img
+                    [src]="post.author.avatar"
+                    [alt]="post.author.name"
+                    loading="lazy"
+                  >
+
+                  <div>
+                    <strong>{{ post.author.name }}</strong>
+                    <small>{{ post.author.role }}</small>
+                  </div>
+                </div>
+
+                <span class="read-link">اقرأ المقال ←</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="categories-section section-space">
+    <div class="container">
+      <div class="center-heading">
+        <span class="section-label">● التصنيفات</span>
+        <h2>استكشف حسب الموضوع</h2>
+        <p>اعثر على محتوى مصمم حسب اهتماماتك</p>
+      </div>
+
+      <div class="categories-grid">
+        @for (category of categories(); track category.name) {
+          <a
+            routerLink="/blog"
+            [queryParams]="{ category: category.name }"
+            class="category-card"
+          >
+            <span class="category-icon" aria-hidden="true">▧</span>
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.count }} مقالات</p>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="latest-section section-space">
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <span class="section-label">● الأحدث</span>
+          <h2>أحدث المقالات</h2>
+          <p>محتوى جديد لإلهام رحلتك الإبداعية</p>
+        </div>
+
+        <a routerLink="/blog" class="read-link">
+          عرض جميع المقالات ←
+        </a>
+      </div>
+
+      <div class="latest-grid">
+        @for (post of latestPosts(); track post.id) {
+          <a routerLink="/blog-details" class="latest-card">
+            <div class="latest-image">
+              <img [src]="post.image" [alt]="post.title" loading="lazy">
+              <span class="image-category">{{ post.category }}</span>
+            </div>
+
+            <div class="latest-body">
+              <span class="article-meta">◷ {{ post.readTime }}</span>
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.excerpt }}</p>
+
+              <div class="article-bottom">
+                <div class="author">
+                  <img
+                    [src]="post.author.avatar"
+                    [alt]="post.author.name"
+                    loading="lazy"
+                  >
+
+                  <div>
+                    <strong>{{ post.author.name }}</strong>
+                    <small>{{ post.author.role }}</small>
+                  </div>
+                </div>
+
+                <span class="arrow-circle" aria-hidden="true">‹</span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<section class="newsletter-section">
+  <div class="container">
+    <div class="newsletter-card">
+      <span class="mail-icon" aria-hidden="true">✉</span>
+
+      <h2>اشترك في <span>نشرتنا الإخبارية</span></h2>
+
+      <p>احصل على نصائح التصوير ودروس جديدة مباشرة في بريدك الإلكتروني</p>
+
+      <form (submit)="subscribe($event)">
+        <input
+          type="email"
+          name="email"
+          placeholder="أدخل بريدك الإلكتروني"
+          aria-label="البريد الإلكتروني"
+          required
+        >
+
+        <button type="submit" class="primary-button">
+          اشترك الآن
+        </button>
+      </form>
+
+      <small>نموذج تجريبي ضمن المشروع التعليمي.</small>
+
+      @if (newsletterMessage()) {
+        <p class="newsletter-message" role="status">
+          {{ newsletterMessage() }}
+        </p>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,87 @@
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a routerLink="/home" class="brand">
+        <span class="brand-icon">ع</span>
+        <strong>عدسة</strong>
+      </a>
+
+      <p>
+        مدونة متخصصة في فن التصوير الفوتوغرافي.
+        نشارك معكم أسرار المحترفين ونصائح عملية لتطوير مهاراتكم.
+      </p>
+    </div>
+
+    <div class="footer-column">
+      <h3>استكشف</h3>
+
+      <nav aria-label="روابط أسفل الصفحة">
+        <a routerLink="/home">الرئيسية</a>
+        <a routerLink="/blog">المدونة</a>
+        <a routerLink="/home" fragment="featured">
+          مقالات مختارة
+        </a>
+      </nav>
+    </div>
+
+    <div class="footer-column">
+      <h3>التصنيفات</h3>
+
+      <nav aria-label="تصنيفات المقالات">
+        <a routerLink="/blog" [queryParams]="{ category: 'إضاءة' }">
+          إضاءة
+        </a>
+
+        <a routerLink="/blog" [queryParams]="{ category: 'بورتريه' }">
+          بورتريه
+        </a>
+
+        <a
+          routerLink="/blog"
+          [queryParams]="{ category: 'مناظر طبيعية' }"
+        >
+          مناظر طبيعية
+        </a>
+
+        <a routerLink="/blog" [queryParams]="{ category: 'تقنيات' }">
+          تقنيات
+        </a>
+
+        <a routerLink="/blog" [queryParams]="{ category: 'معدات' }">
+          معدات
+        </a>
+      </nav>
+    </div>
+
+    <div class="footer-column">
+      <h3>ابقَ على اطلاع</h3>
+
+      <p>اشترك للحصول على أحدث المقالات والتحديثات.</p>
+
+      <form (submit)="subscribe($event)">
+        <input
+          type="email"
+          name="footerEmail"
+          placeholder="أدخل بريدك الإلكتروني"
+          aria-label="البريد الإلكتروني للاشتراك"
+          required
+        >
+
+        <button type="submit">اشترك</button>
+      </form>
+
+      @if (message()) {
+        <p class="form-message" role="status">
+          {{ message() }}
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container bottom-content">
+      <p>© 2026 عدسة. صُنع بكل <span>♥</span> — جميع الحقوق محفوظة.</p>
+      <p>مشروع تعليمي عن التصوير الفوتوغرافي</p>
+    </div>
+  </div>
+</footer>

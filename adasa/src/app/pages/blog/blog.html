@@ -1,0 +1,204 @@
+<section class="blog-hero">
+  <div class="container">
+    <span class="eyebrow">
+      <span class="status-dot"></span>
+      ▧ مدونتنا
+    </span>
+
+    <h1>استكشف <span>مقالاتنا</span></h1>
+
+    <p>اكتشف الدروس والرؤى وأفضل الممارسات للتطوير المستمر</p>
+  </div>
+</section>
+
+<section class="filters-section" aria-label="البحث والتصنيفات">
+  <div class="container filters-content">
+    <div class="search-box">
+      <input
+        id="search"
+        type="search"
+        placeholder="ابحث في المقالات..."
+        aria-label="ابحث في المقالات"
+        [value]="search()"
+        (input)="updateSearch(searchInput.value)"
+        #searchInput
+      >
+
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5"></circle>
+        <path d="m16 16 4 4"></path>
+      </svg>
+    </div>
+
+    <div class="category-buttons" aria-label="تصنيف المقالات">
+      <button
+        type="button"
+        [class.active]="selectedCategory() === 'الكل'"
+        [attr.aria-pressed]="selectedCategory() === 'الكل'"
+        (click)="selectCategory('الكل')"
+      >
+        جميع المقالات
+      </button>
+
+      @for (category of categories(); track category) {
+        <button
+          type="button"
+          [class.active]="selectedCategory() === category"
+          [attr.aria-pressed]="selectedCategory() === category"
+          (click)="selectCategory(category)"
+        >
+          {{ category }}
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="articles-section container" id="articles">
+  @if (loading()) {
+    <div class="state-message" role="status">
+      <span class="loader"></span>
+      <p>جاري تحميل المقالات...</p>
+    </div>
+  } @else if (error()) {
+    <div class="state-message" role="alert">
+      <h2>تعذر تحميل المقالات</h2>
+      <p>{{ error() }}</p>
+      <button type="button" class="orange-button" (click)="loadPosts()">
+        إعادة المحاولة
+      </button>
+    </div>
+  } @else {
+    <div class="results-toolbar">
+      <p aria-live="polite">
+        عرض <strong>{{ filteredPosts().length }}</strong> مقالات
+      </p>
+
+      <div class="view-switch" aria-label="طريقة عرض المقالات">
+        <button
+          type="button"
+          aria-label="عرض شبكي"
+          [class.active]="view() === 'grid'"
+          [attr.aria-pressed]="view() === 'grid'"
+          (click)="view.set('grid')"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="6" height="6" rx="1"></rect>
+            <rect x="15" y="3" width="6" height="6" rx="1"></rect>
+            <rect x="3" y="15" width="6" height="6" rx="1"></rect>
+            <rect x="15" y="15" width="6" height="6" rx="1"></rect>
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          aria-label="عرض قائمة"
+          [class.active]="view() === 'list'"
+          [attr.aria-pressed]="view() === 'list'"
+          (click)="view.set('list')"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="posts-grid" [class.list-view]="view() === 'list'">
+      @for (post of visiblePosts(); track post.id) {
+        <a class="post-card" routerLink="/blog-details">
+          <div class="post-image">
+            <img
+              [src]="post.image"
+              [alt]="post.title"
+              loading="lazy"
+            >
+
+            <span class="category-badge">{{ post.category }}</span>
+          </div>
+
+          <div class="post-body">
+            <div class="post-meta">
+              <span>◷ {{ post.readTime }}</span>
+              <span class="meta-dot">•</span>
+              <time [attr.datetime]="post.date">
+                {{ formatDate(post.date) }}
+              </time>
+            </div>
+
+            <h2>{{ post.title }}</h2>
+            <p class="post-excerpt">{{ post.excerpt }}</p>
+
+            <div class="post-footer">
+              <div class="author">
+                <img
+                  [src]="post.author.avatar"
+                  [alt]="post.author.name"
+                  loading="lazy"
+                >
+
+                <div>
+                  <strong>{{ post.author.name }}</strong>
+                  <small>{{ post.author.role }}</small>
+                </div>
+              </div>
+
+              <span class="card-arrow" aria-hidden="true">‹</span>
+            </div>
+          </div>
+        </a>
+      } @empty {
+        <div class="state-message empty-state">
+          <h2>لا توجد مقالات مطابقة</h2>
+          <p>جرّب كلمة بحث أخرى أو اختر تصنيفًا مختلفًا.</p>
+
+          <button
+            type="button"
+            class="orange-button"
+            (click)="resetFilters()"
+          >
+            عرض جميع المقالات
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination" aria-label="صفحات المقالات">
+        <button
+          type="button"
+          aria-label="الصفحة السابقة"
+          [disabled]="currentPage() === 1"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          ›
+        </button>
+
+        @for (page of pageNumbers(); track page) {
+          <button
+            type="button"
+            [class.active]="currentPage() === page"
+            [attr.aria-label]="'الصفحة ' + page"
+            [attr.aria-current]="currentPage() === page ? 'page' : null"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+
+        <button
+          type="button"
+          aria-label="الصفحة التالية"
+          [disabled]="currentPage() === totalPages()"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          ‹
+        </button>
+      </nav>
+
+      <p class="page-caption">
+        صفحة {{ currentPage() }} من {{ totalPages() }}
+      </p>
+    }
+  }
+</section>
